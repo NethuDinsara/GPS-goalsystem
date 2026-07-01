@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goal & Systems OS</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eefcf6',
+              100: '#d1f7e6',
+              500: '#10b981', /* Emerald */
+              600: '#059669',
+              700: '#047857',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col justify-between overflow-x-hidden antialiased selection:bg-brand-500/30 selection:text-brand-100">
+
+  <!-- Main Container -->
+  <div class="flex-1 flex flex-col pb-24 lg:pb-8">
+    
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-4 py-4 sm:px-6">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="h-9 w-9 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <div>
+            <h1 class="text-md font-extrabold tracking-tight text-white flex items-center gap-1.5 sm:text-lg">
+              SYSTEMS <span class="text-brand-500 font-medium">OS</span>
+            </h1>
+            <p class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase sm:text-[11px]">Goals & Daily Tracking</p>
+          </div>
+        </div>
+
+        <!-- Connection Badge / Configuration Trigger -->
+        <button onclick="switchTab('settings')" class="flex items-center space-x-2 rounded-full px-3 py-1.5 text-xs font-semibold border transition-all duration-300 border-slate-800 bg-slate-900 text-slate-300 hover:border-slate-700" id="connection-badge-btn">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-amber-400" id="connection-pulse"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500" id="connection-dot"></span>
+          </span>
+          <span id="connection-text">Config Sheets API</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Global System Status Alert (Shows if Google Sheets URL is missing) -->
+    <div id="no-sheets-banner" class="bg-amber-950/40 border-b border-amber-500/20 px-4 py-3 transition-all duration-500">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div class="flex items-start space-x-3">
+          <div class="text-amber-500 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <p class="text-xs text-amber-200/95 leading-relaxed">
+            <strong class="font-semibold text-white">Running in Sandbox Mode:</strong> Data is currently saving locally to your browser. Configure your Google Apps Script URL in settings to backup directly to your Google Sheets.
+          </p>
+        </div>
+        <button onclick="switchTab('settings')" class="self-start sm:self-center text-xs text-amber-400 font-bold hover:text-amber-300 transition shrink-0 bg-amber-950/60 px-3 py-1.5 rounded-lg border border-amber-500/20">
+          Setup Connection
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast Notification System -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- Core App Pages -->
+    <main class="max-w-5xl w-full mx-auto px-4 py-6 sm:px-6 flex-1">
+      
+      <!-- ==================== TAB 1: DASHBOARD & OVERVIEW ==================== -->
+      <section id="tab-dashboard" class="space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-bold tracking-tight text-white">Your Command Center</h2>
+            <p class="text-sm text-slate-400">Habits breed consistency. Consistency constructs the target.</p>
+          </div>
+          <button onclick="switchTab('goals')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition duration-200 shadow-lg shadow-brand-500/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            Architect Goal
+          </button>
+        </div>
+
+        <!-- System Score Metric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Total Active Goals -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[140px]">
+            <div>
+              <p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Active Strategic Goals</p>
+              <h3 class="text-3xl font-extrabold text-white mt-2" id="dash-goal-count">0</h3>
+            </div>
+            <div class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
+              Awaiting milestone check
+            </div>
+            <div class="absolute right-4 bottom-4 text-slate-800 opacity-20">
+              <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+          </div>
+
+          <!-- Daily Habits Score Average -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[140px]">
+            <div>
+              <p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Avg Consistency Score</p>
+              <div class="flex items-baseline gap-2 mt-2">
+                <h3 class="text-3xl font-extrabold text-white" id="dash-avg-score">0%</h3>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300" id="dash-score-rating">No Days Logged</span>
+              </div>
+            </div>
+            <div class="text-xs text-slate-400 mt-2 flex items-center gap-1" id="dash-score-footer">
+              Keep scores above 80 to maintain progress
+            </div>
+            <div class="absolute right-4 bottom-4 text-slate-800 opacity-20">
+              <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/></svg>
+            </div>
+          </div>
+
+          <!-- Total Days Checked In -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[140px]">
+            <div>
+              <p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Days Systemized</p>
+              <h3 class="text-3xl font-extrabold text-white mt-2" id="dash-days-logged">0</h3>
+            </div>
+            <div class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Continuous streak metrics
+            </div>
+            <div class="absolute right-4 bottom-4 text-slate-800 opacity-20">
+              <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Goal & Systems Tracker Status -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Column 1 & 2: Main Active Goals List -->
+          <div class="lg:col-span-2 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+              Your Strategic Roadmap
+            </h3>
+
+            <div id="dashboard-goals-list" class="space-y-4">
+              <!-- Dynamically populated goals will render here -->
+            </div>
+          </div>
+
+          <!-- Column 3: Quick Performance History Log -->
+          <div class="space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+              Execution History
+            </h3>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-hidden">
+              <div class="flow-root max-h-[350px] overflow-y-auto no-scrollbar">
+                <ul role="list" class="-my-4 divide-y divide-slate-800" id="dashboard-history-list">
+                  <!-- Dynamically populated daily logs render here -->
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== TAB 2: GOAL SETUP & VALIDATION ==================== -->
+      <section id="tab-goals" class="hidden max-w-3xl mx-auto space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-white">Architect Your Goal & Plan</h2>
+          <p class="text-sm text-slate-400">Phase 1 (Intent) ➔ Phase 2 (Theory & Practical Feasibility) ➔ Phase 3 (Pre-Mortem Failure Mitigation)</p>
+        </div>
+
+        <form id="goal-form" onsubmit="handleGoalFormSubmit(event)" class="space-y-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8">
+          
+          <!-- Phase 1: Contextual Objective -->
+          <div class="space-y-4 border-b border-slate-800 pb-6">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-500">Phase 1: Deep Intention</h3>
+            
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">1. What Specifically (The Target)?</label>
+              <input type="text" id="goal-what" required placeholder="e.g., Gaining 20 to 30 million LKR before 2028" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 transition outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">2. Why (Internal Driving Reason)?</label>
+              <textarea id="goal-why" required rows="2" placeholder="e.g., To move abroad by 2028 in a highly satisfactory and financially secure, solid way." class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 transition outline-none resize-none"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">3. Anti-Goals (Guardrails/Things to Avoid)</label>
+              <textarea id="goal-anti" required rows="2" placeholder="e.g., Cannot work more than 100 hours a week, must maintain control over absolute hours to protect physical health." class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 transition outline-none resize-none"></textarea>
+            </div>
+          </div>
+
+          <!-- Phase 2: Actionable Leverage Moves & Viability -->
+          <div class="space-y-4 border-b border-slate-800 pb-6">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-500">Phase 2: Strategic Plan & Feasibility</h3>
+            
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">3 to 5 Major Moves</label>
+              <p class="text-xs text-slate-500 mb-3">Define the specific leverage actions or high-yield milestones designed to realize the "What".</p>
+              <div class="space-y-2" id="major-moves-container">
+                <input type="text" class="major-move bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm w-full placeholder-slate-600 outline-none transition" placeholder="Move 1 (e.g., Optimize freelance consultancy channels)" required>
+                <input type="text" class="major-move bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm w-full placeholder-slate-600 outline-none transition" placeholder="Move 2 (e.g., Build and scale automation micro-assets)" required>
+                <input type="text" class="major-move bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm w-full placeholder-slate-600 outline-none transition" placeholder="Move 3 (e.g., Invest 40% surplus into secure high-yield assets)" required>
+              </div>
+              <button type="button" onclick="addMajorMoveInput()" class="text-xs text-brand-500 hover:text-brand-400 font-semibold mt-2 flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Add Move
+              </button>
+            </div>
+
+            <!-- Viability Estimators -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-3">
+              <!-- Theory Slider -->
+              <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Realistic in Theory</label>
+                  <span id="theory-val" class="text-sm font-extrabold text-brand-500">85%</span>
+                </div>
+                <input type="range" id="theory-pct" min="10" max="100" step="5" value="85" oninput="calculateViability()" class="w-full accent-brand-500 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                <p class="text-[10px] text-slate-500 mt-2">Mathematically, logic-wise, does the math align fully on paper?</p>
+              </div>
+
+              <!-- Practical Slider -->
+              <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Realistic in Practice</label>
+                  <span id="practice-val" class="text-sm font-extrabold text-brand-500">75%</span>
+                </div>
+                <input type="range" id="practice-pct" min="10" max="100" step="5" value="75" oninput="calculateViability()" class="w-full accent-brand-500 bg-slate-800 h-1.5 rounded-lg cursor-pointer">
+                <p class="text-[10px] text-slate-500 mt-2">Considering human error, fatigue, energy levels, actual capacity.</p>
+              </div>
+            </div>
+
+            <!-- Validation Status Alert -->
+            <div id="viability-warning-box" class="rounded-xl border p-4 transition duration-300">
+              <div class="flex space-x-3 items-start">
+                <div id="viability-icon" class="text-lg"></div>
+                <div>
+                  <h4 id="viability-status-title" class="text-xs font-bold uppercase tracking-wider">Checking Feasibility Metrics</h4>
+                  <p id="viability-status-desc" class="text-xs text-slate-400 mt-1 leading-relaxed"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase 3: Crystal Ball Pre-Mortem -->
+          <div class="space-y-4 pb-4">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-500">Phase 3: Crystal Ball Pre-Mortem</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Fast-forward 1 year. The plan completely failed. Identify the exact 3 reasons why you didn't follow up, and write immediate actionable counter-strategies for each.
+            </p>
+
+            <div class="space-y-4">
+              <!-- Reason & Solution 1 -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Reason for Failure #1</label>
+                  <input type="text" required class="cb-reason bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs w-full text-slate-200" placeholder="e.g., Complete physical burnout from excessive hours.">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Counter-Solution #1</label>
+                  <input type="text" required class="cb-solution bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs w-full text-slate-200" placeholder="e.g., Set a hard alarm at 10 PM. Block Sundays for true rest.">
+                </div>
+              </div>
+
+              <!-- Reason & Solution 2 -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Reason for Failure #2</label>
+                  <input type="text" required class="cb-reason bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs w-full text-slate-200" placeholder="e.g., Loss of daily alignment & drifting back to old habits.">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Counter-Solution #2</label>
+                  <input type="text" required class="cb-solution bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs w-full text-slate-200" placeholder="e.g., Enforce 5-minute daily journaling and scorecard updates.">
+                </div>
+              </div>
+
+              <!-- Reason & Solution 3 -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Reason for Failure #3</label>
+                  <input type="text" required class="cb-reason bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs w-full text-slate-200" placeholder="e.g., Unstable macro conditions / exchange rate hits.">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Counter-Solution #3</label>
+                  <input type="text" required class="cb-solution bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs w-full text-slate-200" placeholder="e.g., Convert holdings to USD/hedged assets immediately.">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Bar -->
+          <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <span class="text-xs text-slate-500">Both values must scale to 80% or more to qualify for structural backup.</span>
+            <button type="submit" id="save-goal-btn" class="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 disabled:opacity-40 disabled:hover:bg-brand-500 text-slate-950 text-sm font-bold px-6 py-3 rounded-xl transition duration-200 flex items-center justify-center gap-2">
+              <span id="save-goal-btn-text">Log & Sync Goal Setup</span>
+              <svg class="w-4 h-4 animate-spin hidden" id="save-goal-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="4" stroke-dasharray="24" class="opacity-25"></circle><path d="M12 2v4M12 18v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M2 12h4M18 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" stroke-width="4" stroke-linecap="round"></path></svg>
+            </button>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- ==================== TAB 3: DAILY SYSTEM & TRACKING ==================== -->
+      <section id="tab-daily" class="hidden max-w-2xl mx-auto space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-white">Daily Execution System</h2>
+          <p class="text-sm text-slate-400">Execution over strategy. Grade today's habits to construct the monthly trend.</p>
+        </div>
+
+        <form id="daily-form" onsubmit="handleDailySubmit(event)" class="space-y-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8">
+          
+          <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-brand-500">Systems Habits Check</h3>
+              <p class="text-xs text-slate-500 mt-1">Non-negotiable identity triggers</p>
+            </div>
+            <!-- Date Picker -->
+            <input type="date" id="daily-date" required class="bg-slate-950 border border-slate-800 focus:border-brand-500 text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-300 outline-none">
+          </div>
+
+          <!-- Interactive Habit Toggles -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Habit 1: Journaling -->
+            <label class="relative flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900/40 cursor-pointer select-none transition">
+              <div class="flex items-center space-x-3">
+                <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold text-slate-200">Daily Journaling</span>
+                  <span class="block text-[10px] text-slate-500">Alignment check-in</span>
+                </div>
+              </div>
+              <input type="checkbox" id="habit-journal" onchange="calculateDailyScore()" class="sr-only peer">
+              <div class="w-9 h-5 bg-slate-800 rounded-full transition-all duration-300 relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 peer-checked:after:bg-white peer-checked:bg-brand-500"></div>
+            </label>
+
+            <!-- Habit 2: Calendar Block -->
+            <label class="relative flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900/40 cursor-pointer select-none transition">
+              <div class="flex items-center space-x-3">
+                <div class="p-2 rounded-lg bg-orange-500/10 text-orange-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold text-slate-200">Calendar Block</span>
+                  <span class="block text-[10px] text-slate-500">Structured execution time</span>
+                </div>
+              </div>
+              <input type="checkbox" id="habit-calendar" onchange="calculateDailyScore()" class="sr-only peer">
+              <div class="w-9 h-5 bg-slate-800 rounded-full transition-all duration-300 relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 peer-checked:after:bg-white peer-checked:bg-brand-500"></div>
+            </label>
+
+            <!-- Habit 3: Vision Board -->
+            <label class="relative flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900/40 cursor-pointer select-none transition">
+              <div class="flex items-center space-x-3">
+                <div class="p-2 rounded-lg bg-pink-500/10 text-pink-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold text-slate-200">Vision Board Review</span>
+                  <span class="block text-[10px] text-slate-500">Clarify goals daily</span>
+                </div>
+              </div>
+              <input type="checkbox" id="habit-vision" onchange="calculateDailyScore()" class="sr-only peer">
+              <div class="w-9 h-5 bg-slate-800 rounded-full transition-all duration-300 relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 peer-checked:after:bg-white peer-checked:bg-brand-500"></div>
+            </label>
+
+            <!-- Habit 4: Weekly Review (Weekly trigger) -->
+            <label class="relative flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900/40 cursor-pointer select-none transition">
+              <div class="flex items-center space-x-3">
+                <div class="p-2 rounded-lg bg-sky-500/10 text-sky-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <div>
+                  <span class="block text-xs font-bold text-slate-200">Weekly System Review</span>
+                  <span class="block text-[10px] text-slate-500">Perform weekly diagnostics</span>
+                </div>
+              </div>
+              <input type="checkbox" id="habit-review" onchange="calculateDailyScore()" class="sr-only peer">
+              <div class="w-9 h-5 bg-slate-800 rounded-full transition-all duration-300 relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 peer-checked:after:bg-white peer-checked:bg-brand-500"></div>
+            </label>
+
+          </div>
+
+          <!-- Score Evaluation & Additional Factor -->
+          <div class="space-y-4 pt-4 border-t border-slate-800">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-500">Accountability Metrics Score</h3>
+            
+            <div class="bg-slate-950 rounded-2xl p-6 border border-slate-800 text-center relative overflow-hidden">
+              <div class="relative z-10">
+                <span class="block text-xs text-slate-400 uppercase font-bold tracking-wider">Today's Computed System Score</span>
+                <span class="block text-5xl font-extrabold text-white mt-2 transition-all duration-300" id="computed-daily-score">0%</span>
+                <p class="text-xs text-slate-500 mt-2 max-w-sm mx-auto" id="score-comment">Log habits above to automatically calculate your foundational system score.</p>
+              </div>
+              <div class="absolute inset-0 bg-brand-500/[0.01] pointer-events-none"></div>
+            </div>
+
+            <!-- Notes Field -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Reflections, Blockers & Pivots</label>
+              <textarea id="daily-notes" rows="3" placeholder="Identify any high-energy friction points or deviations from your plan today..." class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 transition outline-none resize-none"></textarea>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-xs text-slate-500">Scores are written back dynamically to the Google sheet.</span>
+            <button type="submit" id="save-daily-btn" class="bg-brand-500 hover:bg-brand-600 text-slate-950 text-sm font-bold px-6 py-3 rounded-xl transition duration-200 flex items-center gap-2">
+              <span id="save-daily-btn-text">Sync Log Entry</span>
+              <svg class="w-4 h-4 animate-spin hidden" id="save-daily-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="4" stroke-dasharray="24" class="opacity-25"></circle><path d="M12 2v4M12 18v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M2 12h4M18 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" stroke-width="4" stroke-linecap="round"></path></svg>
+            </button>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- ==================== TAB 4: CONFIG & INSTRUCTIONS ==================== -->
+      <section id="tab-settings" class="hidden max-w-2xl mx-auto space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-white">Google Sheet Connection</h2>
+          <p class="text-sm text-slate-400">Transform this standalone UI into a permanent cloud-synced operating system database.</p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+          
+          <!-- API Form -->
+          <div class="space-y-3">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">Google Apps Script Web App URL</label>
+            <input type="url" id="sheets-url-input" placeholder="https://script.google.com/macros/s/XXXXX/exec" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3.5 text-sm text-slate-200 placeholder-slate-700 outline-none transition">
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Don't have a URL yet? Paste your Apps Script deployment URL here once configured to stream user actions instantly to your spreadsheet.
+            </p>
+          </div>
+
+          <!-- Config Controls -->
+          <div class="flex items-center space-x-3 pt-2">
+            <button onclick="saveSheetsConfig()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 text-xs sm:text-sm font-bold px-5 py-2.5 rounded-xl transition">
+              Apply Settings
+            </button>
+            <button onclick="clearSheetsConfig()" class="border border-slate-800 hover:bg-slate-800 text-slate-400 text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl transition">
+              Disconnect Sheet
+            </button>
+          </div>
+
+          <!-- Step-by-Step Directions panel -->
+          <div class="border-t border-slate-800/80 pt-6 space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-brand-500">Quick Connection Guide (Path A)</h3>
+            <ol class="space-y-3 text-xs text-slate-400 list-decimal pl-4">
+              <li class="leading-relaxed">Create a fresh <span class="text-white font-medium">Google Sheet</span>. Set up 3 tabs: <span class="text-white font-mono">Goals & Plans</span>, <span class="text-white font-mono">Daily_Systems</span>, and <span class="text-white font-mono">Weekly_Reviews</span>.</li>
+              <li class="leading-relaxed">Click <span class="text-white font-medium">Extensions > Apps Script</span> in your Sheet menu.</li>
+              <li class="leading-relaxed">Delete any template code and paste your custom Google Script router code.</li>
+              <li class="leading-relaxed">Click the blue <span class="text-white font-medium">Deploy</span> button (Top right) and select <span class="text-white font-medium">New Deployment</span>.</li>
+              <li class="leading-relaxed">Select Web App. Set <span class="text-white font-semibold">Execute as: Me</span> and <span class="text-white font-semibold">Who has access: Anyone</span>.</li>
+              <li class="leading-relaxed">Deploy, authorize access, copy the generated <span class="text-brand-500 font-semibold">Web App URL</span>, and paste it into the input box above!</li>
+            </ol>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Bottom Navigation Bar (Highly optimized for touch, mobile and desktop) -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-md border-t border-slate-800/80 py-2 sm:py-3 shadow-2xl">
+    <div class="max-w-md mx-auto px-6 flex items-center justify-between">
+      
+      <!-- Nav Item 1: Dashboard -->
+      <button onclick="switchTab('dashboard')" class="nav-item flex flex-col items-center space-y-1 group transition active:scale-95 text-brand-500" data-tab="dashboard">
+        <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+        <span class="text-[10px] font-semibold tracking-wide">Command</span>
+      </button>
+
+      <!-- Nav Item 2: Goals Architect -->
+      <button onclick="switchTab('goals')" class="nav-item flex flex-col items-center space-y-1 group transition active:scale-95 text-slate-400 hover:text-white" data-tab="goals">
+        <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span class="text-[10px] font-semibold tracking-wide">Architect</span>
+      </button>
+
+      <!-- Nav Item 3: Daily Habits -->
+      <button onclick="switchTab('daily')" class="nav-item flex flex-col items-center space-y-1 group transition active:scale-95 text-slate-400 hover:text-white" data-tab="daily">
+        <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-[10px] font-semibold tracking-wide">Daily Tracking</span>
+      </button>
+
+      <!-- Nav Item 4: Settings -->
+      <button onclick="switchTab('settings')" class="nav-item flex flex-col items-center space-y-1 group transition active:scale-95 text-slate-400 hover:text-white" data-tab="settings">
+        <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
+        <span class="text-[10px] font-semibold tracking-wide">Settings</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- Core App Logic -->
+  <script>
+    // State Variables
+    let appState = {
+      sheetsUrl: localStorage.getItem("systems_os_sheets_url") || "",
+      goals: JSON.parse(localStorage.getItem("systems_os_goals")) || [],
+      dailyLogs: JSON.parse(localStorage.getItem("systems_os_daily_logs")) || []
+    };
+
+    // Initialize application state on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      // Setup current default date as today
+      const dateInput = document.getElementById("daily-date");
+      if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+      }
+
+      // Perform initial calculations & ui updates
+      calculateViability();
+      calculateDailyScore();
+      updateConnectionStateUI();
+      renderDashboard();
+    });
+
+    // Navigation state logic
+    function switchTab(tabId) {
+      // Hide all tabs
+      const tabs = ["dashboard", "goals", "daily", "settings"];
+      tabs.forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add("hidden");
+      });
+
+      // Show active tab
+      document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+
+      // Update Navigation styling
+      const navItems = document.querySelectorAll(".nav-item");
+      navItems.forEach(item => {
+        if (item.getAttribute("data-tab") === tabId) {
+          item.classList.add("text-brand-500");
+          item.classList.remove("text-slate-400", "hover:text-white");
+        } else {
+          item.classList.remove("text-brand-500");
+          item.classList.add("text-slate-400", "hover:text-white");
+        }
+      });
+    }
+
+    // Dynamic field manipulation: Adds inputs to the Strategic Plan Moves array
+    function addMajorMoveInput() {
+      const container = document.getElementById("major-moves-container");
+      const currentInputs = container.querySelectorAll(".major-move").length;
+      if (currentInputs >= 5) {
+        showToast("Maximum of 5 focus moves recommended to maintain clarity", "warning");
+        return;
+      }
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "major-move bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm w-full placeholder-slate-600 outline-none transition";
+      input.placeholder = `Move ${currentInputs + 1}`;
+      container.appendChild(input);
+    }
+
+    // Live Viability Engine Logic (Theory & Practice threshold monitor)
+    function calculateViability() {
+      const theoryVal = parseInt(document.getElementById("theory-pct").value);
+      const practiceVal = parseInt(document.getElementById("practice-pct").value);
+
+      document.getElementById("theory-val").textContent = `${theoryVal}%`;
+      document.getElementById("practice-val").textContent = `${practiceVal}%`;
+
+      const warningBox = document.getElementById("viability-warning-box");
+      const statusTitle = document.getElementById("viability-status-title");
+      const statusDesc = document.getElementById("viability-status-desc");
+      const icon = document.getElementById("viability-icon");
+      const submitBtn = document.getElementById("save-goal-btn");
+
+      if (theoryVal < 80 || practiceVal < 80) {
+        // Warning: Plan lacks viable focus indices
+        warningBox.className = "rounded-xl border p-4 transition duration-300 bg-amber-950/20 border-amber-500/30 text-amber-200";
+        statusTitle.textContent = "Plan Not Viable - Re-evaluate Strategy";
+        statusDesc.textContent = "To set a strong system for success, both Theory & Practical levels must beat 80%. If lower, simplify your Moves, clear dependencies, or rewrite to fit your actual capacity constraints.";
+        icon.innerHTML = "⚠️";
+        submitBtn.disabled = true;
+      } else {
+        // Pass: Plan meets baseline success projections
+        warningBox.className = "rounded-xl border p-4 transition duration-300 bg-brand-950/20 border-brand-500/30 text-brand-200";
+        statusTitle.textContent = "Plan Fully Viable - Ready to Sync";
+        statusDesc.textContent = "Outstanding configuration! Your plans are structurally sound both on paper and in terms of daily cognitive load. Proceed to finalize deployment.";
+        icon.innerHTML = "✨";
+        submitBtn.disabled = false;
+      }
+    }
+
+    // Computed Daily Score Logic
+    function calculateDailyScore() {
+      const hJournal = document.getElementById("habit-journal").checked;
+      const hCalendar = document.getElementById("habit-calendar").checked;
+      const hVision = document.getElementById("habit-vision").checked;
+      const hReview = document.getElementById("habit-review").checked;
+
+      // Calculate simple progress score (each counts as 25%)
+      let score = 0;
+      if (hJournal) score += 25;
+      if (hCalendar) score += 25;
+      if (hVision) score += 25;
+      if (hReview) score += 25;
+
+      const scoreEl = document.getElementById("computed-daily-score");
+      scoreEl.textContent = `${score}%`;
+
+      // Update color coding based on rating threshold
+      if (score >= 100) {
+        scoreEl.className = "block text-5xl font-extrabold text-brand-500 mt-2 transition-all duration-300";
+      } else if (score >= 75) {
+        scoreEl.className = "block text-5xl font-extrabold text-teal-400 mt-2 transition-all duration-300";
+      } else if (score >= 50) {
+        scoreEl.className = "block text-5xl font-extrabold text-amber-500 mt-2 transition-all duration-300";
+      } else {
+        scoreEl.className = "block text-5xl font-extrabold text-red-500 mt-2 transition-all duration-300";
+      }
+
+      // Update contextual evaluation comment
+      const comments = {
+        0: "Habits configure the identity. Toggle items to grade performance.",
+        25: "Step 1 achieved. Maintain momentum.",
+        50: "Average performance. Double down on block scheduling.",
+        75: "Excellent. Your system is functioning high-yield.",
+        100: "Peak focus. Absolute execution achieved."
+      };
+      document.getElementById("score-comment").textContent = comments[score] || "";
+    }
+
+    // Local Storage & API Connector Integration Core
+    function saveSheetsConfig() {
+      const urlInput = document.getElementById("sheets-url-input").value.trim();
+      if (!urlInput) {
+        showToast("Please supply a valid deployment URL first.", "error");
+        return;
+      }
+
+      if (!urlInput.startsWith("https://script.google.com/")) {
+        showToast("Invalid URL pattern. Paste the full Apps Script Web App URL.", "warning");
+        return;
+      }
+
+      appState.sheetsUrl = urlInput;
+      localStorage.setItem("systems_os_sheets_url", urlInput);
+      updateConnectionStateUI();
+      showToast("Google Sheets routing active!", "success");
+      switchTab("dashboard");
+    }
+
+    function clearSheetsConfig() {
+      appState.sheetsUrl = "";
+      localStorage.removeItem("systems_os_sheets_url");
+      document.getElementById("sheets-url-input").value = "";
+      updateConnectionStateUI();
+      showToast("Disconnected. System returned to sandbox storage.", "info");
+    }
+
+    function updateConnectionStateUI() {
+      const badgeBtn = document.getElementById("connection-badge-btn");
+      const pulse = document.getElementById("connection-pulse");
+      const dot = document.getElementById("connection-dot");
+      const text = document.getElementById("connection-text");
+      const banner = document.getElementById("no-sheets-banner");
+
+      if (appState.sheetsUrl) {
+        // Connected to API
+        pulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-brand-400";
+        dot.className = "relative inline-flex rounded-full h-2 w-2 bg-brand-500";
+        text.textContent = "Google Sheets Active";
+        badgeBtn.className = "flex items-center space-x-2 rounded-full px-3 py-1.5 text-xs font-semibold border transition-all duration-300 border-brand-500/20 bg-brand-950/20 text-brand-300 hover:border-brand-500/40";
+        banner.classList.add("hidden");
+        document.getElementById("sheets-url-input").value = appState.sheetsUrl;
+      } else {
+        // Disconnected (Sandbox local Storage)
+        pulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-amber-400";
+        dot.className = "relative inline-flex rounded-full h-2 w-2 bg-amber-500";
+        text.textContent = "Sandbox Mode";
+        badgeBtn.className = "flex items-center space-x-2 rounded-full px-3 py-1.5 text-xs font-semibold border transition-all duration-300 border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700";
+        banner.classList.remove("hidden");
+      }
+    }
+
+    // Strategic Goal Submission handler
+    async function handleGoalFormSubmit(e) {
+      e.preventDefault();
+      
+      const what = document.getElementById("goal-what").value.trim();
+      const why = document.getElementById("goal-why").value.trim();
+      const anti = document.getElementById("goal-anti").value.trim();
+      
+      // Extract Moves array
+      const moves = [];
+      document.querySelectorAll(".major-move").forEach(el => {
+        const val = el.value.trim();
+        if (val) moves.push(val);
+      });
+
+      const theoryPct = parseInt(document.getElementById("theory-pct").value);
+      const practicePct = parseInt(document.getElementById("practice-pct").value);
+
+      // Extract Crystal Ball elements
+      const reasons = [];
+      document.querySelectorAll(".cb-reason").forEach(el => {
+        const val = el.value.trim();
+        if (val) reasons.push(val);
+      });
+
+      const solutions = [];
+      document.querySelectorAll(".cb-solution").forEach(el => {
+        const val = el.value.trim();
+        if (val) solutions.push(val);
+      });
+
+      const newGoal = {
+        id: Date.now().toString(),
+        createdAt: new Date().toLocaleDateString(),
+        what,
+        why,
+        antiGoals: anti,
+        majorMoves: moves,
+        theoryPct,
+        practicePct,
+        crystalBallFailures: reasons,
+        crystalBallSolutions: solutions
+      };
+
+      // Loading Animation triggers
+      const btn = document.getElementById("save-goal-btn");
+      const btnText = document.getElementById("save-goal-btn-text");
+      const spinner = document.getElementById("save-goal-spinner");
+
+      btn.disabled = true;
+      btnText.textContent = "Syncing with Sheets...";
+      spinner.classList.remove("hidden");
+
+      // Save locally as fallback/instant view
+      appState.goals.unshift(newGoal);
+      localStorage.setItem("systems_os_goals", JSON.stringify(appState.goals));
+
+      let syncSuccessful = false;
+
+      // Cloud integration call if enabled
+      if (appState.sheetsUrl) {
+        try {
+          const response = await fetch(appState.sheetsUrl, {
+            method: "POST",
+            mode: "no-cors", // Bypasses browser restriction blocks
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              action: "saveGoal",
+              payload: newGoal
+            })
+          });
+          syncSuccessful = true;
+        } catch (err) {
+          console.error("Sheets Error:", err);
+          showToast("Sync issue encountered, saved inside browser local storage.", "warning");
+        }
+      }
+
+      // Reset Form State
+      document.getElementById("goal-form").reset();
+      // Reset sliders & warning
+      document.getElementById("theory-pct").value = "85";
+      document.getElementById("practice-pct").value = "75";
+      // Clear extra inputs except the baseline 3
+      const container = document.getElementById("major-moves-container");
+      container.innerHTML = `
+        <input type="text" class="major-move bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm w-full placeholder-slate-600 outline-none transition" placeholder="Move 1" required>
+        <input type="text" class="major-move bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm w-full placeholder-slate-600 outline-none transition" placeholder="Move 2" required>
+        <input type="text" class="major-move bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm w-full placeholder-slate-600 outline-none transition" placeholder="Move 3" required>
+      `;
+
+      btn.disabled = false;
+      btnText.textContent = "Log & Sync Goal Setup";
+      spinner.classList.add("hidden");
+
+      if (syncSuccessful) {
+        showToast("Goal written directly to Google Sheets!", "success");
+      } else {
+        showToast("Goal archived in local sandbox database.", "success");
+      }
+
+      calculateViability();
+      renderDashboard();
+      switchTab("dashboard");
+    }
+
+    // Daily Habit Log Entry submission handler
+    async function handleDailySubmit(e) {
+      e.preventDefault();
+
+      const date = document.getElementById("daily-date").value;
+      const journalDone = document.getElementById("habit-journal").checked;
+      const calendarBlocked = document.getElementById("habit-calendar").checked;
+      const visionBoardReviewed = document.getElementById("habit-vision").checked;
+      const weeklyReviewDone = document.getElementById("habit-review").checked;
+      const notes = document.getElementById("daily-notes").value.trim();
+
+      // Compute Daily Score again to be sure
+      let dailyScore = 0;
+      if (journalDone) dailyScore += 25;
+      if (calendarBlocked) dailyScore += 25;
+      if (visionBoardReviewed) dailyScore += 25;
+      if (weeklyReviewDone) dailyScore += 25;
+
+      const newLog = {
+        id: Date.now().toString(),
+        date,
+        journalDone,
+        calendarBlocked,
+        visionBoardReviewed,
+        weeklyReviewDone,
+        dailyScore,
+        notes
+      };
+
+      // Loading Indicators
+      const btn = document.getElementById("save-daily-btn");
+      const btnText = document.getElementById("save-daily-btn-text");
+      const spinner = document.getElementById("save-daily-spinner");
+
+      btn.disabled = true;
+      btnText.textContent = "Syncing with Sheets...";
+      spinner.classList.remove("hidden");
+
+      // Save locally
+      appState.dailyLogs.unshift(newLog);
+      localStorage.setItem("systems_os_daily_logs", JSON.stringify(appState.dailyLogs));
+
+      let syncSuccessful = false;
+
+      // Cloud integration call if enabled
+      if (appState.sheetsUrl) {
+        try {
+          await fetch(appState.sheetsUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              action: "saveDaily",
+              payload: newLog
+            })
+          });
+          syncSuccessful = true;
+        } catch (err) {
+          console.error("Sheets Error:", err);
+          showToast("Sync issue encountered, saved inside browser local storage.", "warning");
+        }
+      }
+
+      // Reset fields
+      document.getElementById("daily-form").reset();
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("daily-date").value = today;
+
+      btn.disabled = false;
+      btnText.textContent = "Sync Log Entry";
+      spinner.classList.add("hidden");
+
+      if (syncSuccessful) {
+        showToast("Logged directly to Google Sheets!", "success");
+      } else {
+        showToast("Entry saved to sandbox storage database.", "success");
+      }
+
+      calculateDailyScore();
+      renderDashboard();
+      switchTab("dashboard");
+    }
+
+    // Delete a goal locally
+    function deleteGoalLocally(goalId) {
+      if (confirm("Are you sure you want to archive this goal from this device? (Note: Sheet entries are never deleted to preserve tracking history).")) {
+        appState.goals = appState.goals.filter(g => g.id !== goalId);
+        localStorage.setItem("systems_os_goals", JSON.stringify(appState.goals));
+        showToast("Goal archived from localized device overview.", "info");
+        renderDashboard();
+      }
+    }
+
+    // Dynamic UI Renderer
+    function renderDashboard() {
+      const goalsList = document.getElementById("dashboard-goals-list");
+      const historyList = document.getElementById("dashboard-history-list");
+      
+      // Goal Count Update
+      document.getElementById("dash-goal-count").textContent = appState.goals.length;
+
+      // Score Metrics Computations
+      if (appState.dailyLogs.length > 0) {
+        const totalScore = appState.dailyLogs.reduce((acc, log) => acc + log.dailyScore, 0);
+        const avg = Math.round(totalScore / appState.dailyLogs.length);
+        
+        document.getElementById("dash-avg-score").textContent = `${avg}%`;
+        document.getElementById("dash-days-logged").textContent = appState.dailyLogs.length;
+
+        const rating = document.getElementById("dash-score-rating");
+        if (avg >= 80) {
+          rating.textContent = "Highly Consistent";
+          rating.className = "text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400";
+        } else if (avg >= 50) {
+          rating.textContent = "Unstable Process";
+          rating.className = "text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400";
+        } else {
+          rating.textContent = "Critical Danger";
+          rating.className = "text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/10 text-red-400";
+        }
+      } else {
+        document.getElementById("dash-avg-score").textContent = "0%";
+        document.getElementById("dash-days-logged").textContent = "0";
+        const rating = document.getElementById("dash-score-rating");
+        rating.textContent = "No Days Logged";
+        rating.className = "text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400";
+      }
+
+      // Render Goals List
+      if (appState.goals.length === 0) {
+        goalsList.innerHTML = `
+          <div class="bg-slate-950 border border-dashed border-slate-800 rounded-2xl p-8 text-center text-slate-500">
+            <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <p class="text-sm font-medium">No strategic goals defined yet.</p>
+            <p class="text-xs text-slate-600 mt-1 max-w-sm mx-auto">Click "Architect Goal" above to frame your core goal, viability calculations, and safety plan.</p>
+          </div>
+        `;
+      } else {
+        goalsList.innerHTML = appState.goals.map(goal => `
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 relative overflow-hidden">
+            <!-- Header -->
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="text-[10px] bg-slate-800 text-slate-400 font-bold tracking-widest uppercase px-2 py-0.5 rounded-md">Goal Established: ${goal.createdAt}</span>
+                <h4 class="text-lg font-bold text-white mt-1.5">${goal.what}</h4>
+              </div>
+              <button onclick="deleteGoalLocally('${goal.id}')" class="text-slate-500 hover:text-red-400 p-1.5 transition rounded-lg hover:bg-slate-950" title="Archive locally">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+
+            <!-- Deep Intention details -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950/40 p-4 rounded-xl border border-slate-800/65">
+              <div>
+                <span class="block text-[10px] text-brand-500 uppercase font-bold tracking-wider">The "Why" Directive</span>
+                <p class="text-xs text-slate-300 mt-1 italic">"${goal.why}"</p>
+              </div>
+              <div>
+                <span class="block text-[10px] text-amber-500 uppercase font-bold tracking-wider">The Anti-Goal Guardrails</span>
+                <p class="text-xs text-slate-300 mt-1 italic">"${goal.antiGoals}"</p>
+              </div>
+            </div>
+
+            <!-- Moves Progression list -->
+            <div>
+              <span class="block text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2">3 to 5 Major Moves Sequence</span>
+              <div class="flex flex-wrap gap-2">
+                ${goal.majorMoves.map((move, i) => `
+                  <span class="text-xs bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-200 font-medium">
+                    <span class="text-brand-500 font-bold mr-1">#${i+1}</span> ${move}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Pre-Mortem Mitigation Framework -->
+            <div class="border-t border-slate-800/80 pt-3">
+              <span class="block text-[10px] text-red-400 uppercase font-bold tracking-wider mb-2">Crystal Ball Mitigation Plan</span>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                ${goal.crystalBallFailures.map((fail, index) => `
+                  <div class="bg-slate-950/45 p-3 rounded-lg border border-slate-800/80 text-[11px]">
+                    <span class="block text-red-500 font-semibold uppercase tracking-wider text-[9px] mb-1">Pre-Mortem Failure #${index + 1}</span>
+                    <p class="text-slate-300 mb-1.5 font-medium">"${fail}"</p>
+                    <span class="block text-brand-500 font-semibold uppercase tracking-wider text-[9px] mb-1">Safety Pivot</span>
+                    <p class="text-slate-400 italic">"${goal.crystalBallSolutions[index]}"</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Viability Banner Metrics -->
+            <div class="flex items-center space-x-4 border-t border-slate-800/50 pt-3 mt-1.5 text-xs text-slate-500">
+              <span class="flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Theory score: <strong class="text-slate-200">${goal.theoryPct}%</strong>
+              </span>
+              <span class="flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Practice score: <strong class="text-slate-200">${goal.practicePct}%</strong>
+              </span>
+            </div>
+          </div>
+        `);
+      }
+
+      // Render History Log List
+      if (appState.dailyLogs.length === 0) {
+        historyList.innerHTML = `
+          <li class="py-8 text-center text-slate-500 text-xs leading-relaxed">
+            No check-ins filed. Habit consistency scores will populate dynamically.
+          </li>
+        `;
+      } else {
+        historyList.innerHTML = appState.dailyLogs.slice(0, 8).map(log => `
+          <li class="py-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-white">${formatNiceDate(log.date)}</span>
+                <span class="block text-[10px] text-slate-500 mt-0.5">Checked habits: [ ${log.journalDone ? 'Journal' : ''} ${log.calendarBlocked ? 'Calendar' : ''} ${log.visionBoardReviewed ? 'Vision' : ''} ${log.weeklyReviewDone ? 'Weekly' : ''} ]</span>
+              </div>
+              <div class="text-right">
+                <span class="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-bold ${getScoreBadgeColorClass(log.dailyScore)}">
+                  Score: ${log.dailyScore}%
+                </span>
+              </div>
+            </div>
+            ${log.notes ? `<p class="text-xs italic text-slate-400 bg-slate-950/45 p-2 rounded-lg border border-slate-800">"${log.notes}"</p>` : ''}
+          </li>
+        `).join('');
+      }
+    }
+
+    // Small helper functions
+    function formatNiceDate(raw) {
+      const options = { month: 'short', day: 'numeric', year: 'numeric' };
+      const date = new Date(raw + 'T00:00:00'); // Ensure local timezone parsing
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    function getScoreBadgeColorClass(score) {
+      if (score >= 100) return 'bg-brand-500/10 text-brand-400';
+      if (score >= 75) return 'bg-teal-500/10 text-teal-400';
+      if (score >= 50) return 'bg-amber-500/10 text-amber-400';
+      return 'bg-red-500/10 text-red-400';
+    }
+
+    // UI Toast system notifications
+    function showToast(message, type = "success") {
+      const container = document.getElementById("toast-container");
+      
+      const toast = document.createElement("div");
+      toast.className = "p-4 rounded-xl shadow-lg border text-xs font-semibold text-white pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 flex items-center justify-between gap-3";
+      
+      const theme = {
+        success: "bg-slate-900 border-brand-500/40 text-slate-100",
+        warning: "bg-slate-900 border-amber-500/40 text-amber-200",
+        error: "bg-slate-900 border-red-500/40 text-red-200",
+        info: "bg-slate-900 border-slate-700 text-slate-300"
+      };
+
+      toast.className += " " + (theme[type] || theme.success);
+      toast.innerHTML = `
+        <span class="flex-1">${message}</span>
+        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white">&times;</button>
+      `;
+
+      container.appendChild(toast);
+
+      // Force animation reflow trigger
+      setTimeout(() => {
+        toast.classList.remove("translate-y-2", "opacity-0");
+      }, 50);
+
+      // Remove toast after duration
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "translate-y-2");
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
