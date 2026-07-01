@@ -173,7 +173,7 @@
           <div class="lg:col-span-2 space-y-4">
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-brand-500"></span>
-              Your Strategic Roadmap
+              Your Strategic Roadmap & Step-by-Step Executions
             </h3>
 
             <div id="dashboard-goals-list" class="space-y-4">
@@ -471,10 +471,19 @@
             <input type="date" id="weekly-date" required class="bg-slate-950 border border-slate-800 focus:border-brand-500 text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-300 outline-none">
           </div>
 
+          <!-- RELATIONAL FIELD: LINK TO PARENT GOAL -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">Execute for Parent Strategic Goal</label>
+            <p class="text-xs text-slate-500">Select which long-term strategic plan these tactical weekly focus tasks will execute.</p>
+            <select id="weekly-parent-goal" required class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 transition outline-none">
+              <option value="" disabled selected>-- Select Active Goal --</option>
+            </select>
+          </div>
+
           <!-- Section A: 3 Weekly Focus Goals -->
           <div class="space-y-3">
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">This Week's Core Focus Areas (Tactical Goals)</label>
-            <p class="text-xs text-slate-500">Set 3 highly leverageable accomplishments for this week to execute your strategic plan.</p>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">This Week's Core Focus Areas (Action Tasks)</label>
+            <p class="text-xs text-slate-500">Set 3 highly leverageable accomplishments for this week to execute your selected strategic plan.</p>
             <div class="space-y-2">
               <input type="text" id="weekly-goal-1" required placeholder="Weekly Target 1 (e.g. Code the landing page boilerplate)" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-700 outline-none transition">
               <input type="text" id="weekly-goal-2" required placeholder="Weekly Target 2 (e.g. Refine pricing packages & send 5 proposals)" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-700 outline-none transition">
@@ -657,8 +666,9 @@
       const activeElement = document.getElementById(`tab-${tabId}`);
       if (activeElement) activeElement.classList.remove("hidden");
 
-      // Recalculate stats dynamically if visiting weekly reviews tab
+      // Dynamic updates when switching tabs
       if (tabId === 'weekly') {
+        populateWeeklyParentDropdown();
         calculateWeeklyStats();
       }
 
@@ -779,6 +789,31 @@
       avgEl.textContent = `${averageScore}%`;
     }
 
+    // Populate dropdown with active goals
+    function populateWeeklyParentDropdown() {
+      const select = document.getElementById("weekly-parent-goal");
+      if (!select) return;
+
+      // Reset options but keep placeholder
+      select.innerHTML = '<option value="" disabled selected>-- Select Active Goal --</option>';
+
+      if (appState.goals.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.disabled = true;
+        option.textContent = "No strategic goals saved yet.";
+        select.appendChild(option);
+        return;
+      }
+
+      appState.goals.forEach(goal => {
+        const option = document.createElement("option");
+        option.value = goal.id;
+        option.textContent = goal.what;
+        select.appendChild(option);
+      });
+    }
+
     // Local Storage & API Connector Integration Core
     function saveSheetsConfig() {
       const urlInput = document.getElementById("sheets-url-input").value.trim();
@@ -864,7 +899,7 @@
       });
 
       const newGoal = {
-        id: Date.now().toString(),
+        id: "goal_" + Date.now().toString(),
         createdAt: new Date().toLocaleDateString(),
         what,
         why,
@@ -959,7 +994,7 @@
       if (weeklyReviewDone) dailyScore += 25;
 
       const newLog = {
-        id: Date.now().toString(),
+        id: "daily_" + Date.now().toString(),
         date,
         journalDone,
         calendarBlocked,
@@ -1032,6 +1067,12 @@
       const weekEndingDate = document.getElementById("weekly-date").value;
       const weeklyReviewDone = document.getElementById("weekly-done").checked;
       const pivotNotes = document.getElementById("weekly-pivot").value.trim();
+      const parentGoalId = document.getElementById("weekly-parent-goal").value;
+
+      if (!parentGoalId) {
+        showToast("Please choose which parent Strategic Goal these tasks will advance.", "error");
+        return;
+      }
 
       // Retrieve focus goals
       const goal1 = document.getElementById("weekly-goal-1").value.trim();
@@ -1047,7 +1088,8 @@
       }
 
       const newWeeklyLog = {
-        id: Date.now().toString(),
+        id: "week_" + Date.now().toString(),
+        parentGoalId, // Relational connection
         weekEndingDate,
         weeklyReviewDone,
         avgScore,
@@ -1156,7 +1198,7 @@
         rating.className = "text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400";
       }
 
-      // Render Goals List
+      // Render Goals List with relational connection to Weekly Reviews
       if (appState.goals.length === 0) {
         goalsList.innerHTML = `
           <div class="bg-slate-950 border border-dashed border-slate-800 rounded-2xl p-8 text-center text-slate-500">
@@ -1169,21 +1211,45 @@
         `;
       } else {
         goalsList.innerHTML = appState.goals.map(goal => {
-          // Look up active weekly goals to see if they associate with the dashboard
-          const currentWeeklyReview = appState.weeklyReviews[0];
-          const weeklyGoalsSection = currentWeeklyReview ? `
-            <div class="border-t border-slate-800/80 pt-3">
-              <span class="block text-[10px] text-brand-400 uppercase font-bold tracking-wider mb-2">Tactical Weekly Focus (Action Goals)</span>
-              <ul class="space-y-1 text-xs text-slate-300">
-                ${currentWeeklyReview.weeklyGoals.map((wg, idx) => `
-                  <li class="flex items-center gap-1.5 font-medium">
-                    <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
-                    Target #${idx+1}: <span class="text-slate-100">${wg}</span>
-                  </li>
-                `).join('')}
-              </ul>
-            </div>
-          ` : '';
+          
+          // CRUCIAL RELATIONAL LINK: Get all Weekly reviews tied directly to this goal ID
+          const linkedWeeklyReviews = appState.weeklyReviews.filter(review => review.parentGoalId === goal.id);
+          
+          let weeklyFocusHtml = "";
+          if (linkedWeeklyReviews.length > 0) {
+            const activeReview = linkedWeeklyReviews[0]; // Fetch the most recent review
+            weeklyFocusHtml = `
+              <div class="border-t border-slate-800/80 pt-4 mt-3">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="block text-[11px] text-brand-400 uppercase font-bold tracking-wider">Active Weekly Execution Sprints</span>
+                  <span class="text-[10px] text-slate-500">Weekending: ${activeReview.weekEndingDate}</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  ${activeReview.weeklyGoals.map((wg, idx) => `
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl px-3 py-2 flex items-center gap-2">
+                      <span class="h-5 w-5 shrink-0 rounded-lg bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-[10px] font-bold text-brand-500">
+                        ${idx + 1}
+                      </span>
+                      <span class="text-xs text-slate-300 font-medium truncate" title="${wg}">${wg}</span>
+                    </div>
+                  `).join('')}
+                </div>
+                <div class="mt-2 bg-slate-950/30 p-2.5 rounded-lg border border-slate-800/60">
+                  <span class="block text-[9px] uppercase tracking-wider text-brand-500 font-extrabold mb-1">Sprint Pivot Strategy</span>
+                  <p class="text-xs text-slate-400 italic">"${activeReview.pivotNotes}"</p>
+                </div>
+              </div>
+            `;
+          } else {
+            weeklyFocusHtml = `
+              <div class="border-t border-slate-800/50 pt-3 mt-3 text-center">
+                <p class="text-xs text-slate-500">No active weekly tasks connected to this goal.</p>
+                <button onclick="switchTab('weekly')" class="text-[11px] text-brand-500 hover:text-brand-400 font-bold mt-1 inline-flex items-center gap-1">
+                  Create Weekly System Execution Target ➔
+                </button>
+              </div>
+            `;
+          }
 
           return `
             <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 relative overflow-hidden">
@@ -1219,39 +1285,39 @@
                       <span class="text-brand-500 font-bold mr-1">#${i+1}</span> ${move}
                     </span>
                   `).join('')}
+                </div>
+              </div>
+
+              <!-- Weekly Focus target connection on Dashboard -->
+              ${weeklyFocusHtml}
+
+              <!-- Pre-Mortem Mitigation Framework -->
+              <div class="border-t border-slate-800/80 pt-3">
+                <span class="block text-[10px] text-red-400 uppercase font-bold tracking-wider mb-2">Crystal Ball Mitigation Plan</span>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  ${goal.crystalBallFailures.map((fail, index) => `
+                    <div class="bg-slate-950/45 p-3 rounded-lg border border-slate-800/80 text-[11px]">
+                      <span class="block text-red-500 font-semibold uppercase tracking-wider text-[9px] mb-1">Pre-Mortem Failure #${index + 1}</span>
+                      <p class="text-slate-300 mb-1.5 font-medium leading-relaxed">"${fail}"</p>
+                      <span class="block text-brand-500 font-semibold uppercase tracking-wider text-[9px] mb-1">Safety Pivot</span>
+                      <p class="text-slate-400 italic leading-relaxed">"${goal.crystalBallSolutions[index]}"</p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Viability Banner Metrics -->
+              <div class="flex items-center space-x-4 border-t border-slate-800/50 pt-3 mt-1.5 text-xs text-slate-500">
+                <span class="flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Theory score: <strong class="text-slate-200">${goal.theoryPct}%</strong>
+                </span>
+                <span class="flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Practice score: <strong class="text-slate-200">${goal.practicePct}%</strong>
+                </span>
               </div>
             </div>
-
-            <!-- Weekly Focus target connection on Dashboard -->
-            ${weeklyGoalsSection}
-
-            <!-- Pre-Mortem Mitigation Framework -->
-            <div class="border-t border-slate-800/80 pt-3">
-              <span class="block text-[10px] text-red-400 uppercase font-bold tracking-wider mb-2">Crystal Ball Mitigation Plan</span>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                ${goal.crystalBallFailures.map((fail, index) => `
-                  <div class="bg-slate-950/45 p-3 rounded-lg border border-slate-800/80 text-[11px]">
-                    <span class="block text-red-500 font-semibold uppercase tracking-wider text-[9px] mb-1">Pre-Mortem Failure #${index + 1}</span>
-                    <p class="text-slate-300 mb-1.5 font-medium">"${fail}"</p>
-                    <span class="block text-brand-500 font-semibold uppercase tracking-wider text-[9px] mb-1">Safety Pivot</span>
-                    <p class="text-slate-400 italic">"${goal.crystalBallSolutions[index]}"</p>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-
-            <!-- Viability Banner Metrics -->
-            <div class="flex items-center space-x-4 border-t border-slate-800/50 pt-3 mt-1.5 text-xs text-slate-500">
-              <span class="flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Theory score: <strong class="text-slate-200">${goal.theoryPct}%</strong>
-              </span>
-              <span class="flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Practice score: <strong class="text-slate-200">${goal.practicePct}%</strong>
-              </span>
-            </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
       }
 
       // Render History Log List
