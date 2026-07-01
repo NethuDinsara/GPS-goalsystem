@@ -46,7 +46,7 @@
 <body class="h-full flex flex-col justify-between overflow-x-hidden antialiased selection:bg-brand-500/30 selection:text-brand-100">
 
   <!-- Main Container -->
-  <div class="flex-1 flex flex-col pb-24 lg:pb-8">
+  <div class="flex-1 flex flex-col pb-28 lg:pb-12">
     
     <!-- Top Navigation Header -->
     <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-4 py-4 sm:px-6">
@@ -104,10 +104,16 @@
             <h2 class="text-2xl font-bold tracking-tight text-white">Your Command Center</h2>
             <p class="text-sm text-slate-400">Habits breed consistency. Consistency constructs the target.</p>
           </div>
-          <button onclick="switchTab('goals')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition duration-200 shadow-lg shadow-brand-500/20">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-            Architect Goal
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="switchTab('weekly')" class="border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition duration-200 flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+              Weekly System
+            </button>
+            <button onclick="switchTab('goals')" class="bg-brand-500 hover:bg-brand-600 text-slate-950 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition duration-200 shadow-lg shadow-brand-500/20">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+              Architect Goal
+            </button>
+          </div>
         </div>
 
         <!-- System Score Metric Cards -->
@@ -448,6 +454,78 @@
         </form>
       </section>
 
+      <!-- ==================== TAB 5: WEEKLY SYSTEM & REVIEW ==================== -->
+      <section id="tab-weekly" class="hidden max-w-2xl mx-auto space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-white">Weekly Review & Strategy Upgrade</h2>
+          <p class="text-sm text-slate-400">Step back, evaluate execution trends, and lock in focus areas for the upcoming sprint.</p>
+        </div>
+
+        <form id="weekly-form" onsubmit="handleWeeklySubmit(event)" class="space-y-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-brand-500">Weekly Calibration</h3>
+              <p class="text-xs text-slate-500 mt-1">Reviewing process consistency parameters</p>
+            </div>
+            <!-- Week ending picker -->
+            <input type="date" id="weekly-date" required class="bg-slate-950 border border-slate-800 focus:border-brand-500 text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-300 outline-none">
+          </div>
+
+          <!-- Section A: 3 Weekly Focus Goals -->
+          <div class="space-y-3">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">This Week's Core Focus Areas (Tactical Goals)</label>
+            <p class="text-xs text-slate-500">Set 3 highly leverageable accomplishments for this week to execute your strategic plan.</p>
+            <div class="space-y-2">
+              <input type="text" id="weekly-goal-1" required placeholder="Weekly Target 1 (e.g. Code the landing page boilerplate)" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-700 outline-none transition">
+              <input type="text" id="weekly-goal-2" required placeholder="Weekly Target 2 (e.g. Refine pricing packages & send 5 proposals)" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-700 outline-none transition">
+              <input type="text" id="weekly-goal-3" required placeholder="Weekly Target 3 (e.g. Schedule rest block for Sunday)" class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-700 outline-none transition">
+            </div>
+          </div>
+
+          <!-- Section B: Automated Habit Score Verification -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Habit Score Verification</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-center">
+                <span class="text-[10px] text-slate-500 font-bold uppercase">Computed Weekly Habit Average</span>
+                <span id="weekly-habit-average" class="text-3xl font-extrabold text-brand-500 mt-1">0%</span>
+                <p class="text-[9px] text-slate-500 mt-1">Sourced dynamically from your daily check-in entries.</p>
+              </div>
+              <div class="flex items-center">
+                <label class="relative flex items-center justify-between p-4 rounded-xl border border-slate-800 bg-slate-950/40 hover:bg-slate-900/40 cursor-pointer select-none transition w-full">
+                  <div class="flex items-center space-x-3">
+                    <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                      <span class="block text-xs font-bold text-slate-200">System Review Done</span>
+                      <span class="block text-[10px] text-slate-500">Lock in system trends</span>
+                    </div>
+                  </div>
+                  <input type="checkbox" id="weekly-done" class="sr-only peer">
+                  <div class="w-9 h-5 bg-slate-800 rounded-full transition-all duration-300 relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4 peer-checked:after:bg-white peer-checked:bg-brand-500"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section C: Diagnostic Audit & Pivot -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Pivot Notes, Systemic Friction & Improvements</label>
+            <textarea id="weekly-pivot" rows="3" placeholder="What blocked you this week? What absolute improvements will you deploy in next week's environment to ensure success?..." class="w-full bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 transition outline-none resize-none" required></textarea>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-xs text-slate-500">Synced directly to the 'Weekly_Reviews' sheet tab.</span>
+            <button type="submit" id="save-weekly-btn" class="bg-brand-500 hover:bg-brand-600 text-slate-950 text-sm font-bold px-6 py-3 rounded-xl transition duration-200 flex items-center gap-2">
+              <span id="save-weekly-btn-text">Archive Weekly review</span>
+              <svg class="w-4 h-4 animate-spin hidden" id="save-weekly-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="4" stroke-dasharray="24" class="opacity-25"></circle><path d="M12 2v4M12 18v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M2 12h4M18 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" stroke-width="4" stroke-linecap="round"></path></svg>
+            </button>
+          </div>
+        </form>
+      </section>
+
       <!-- ==================== TAB 4: CONFIG & INSTRUCTIONS ==================== -->
       <section id="tab-settings" class="hidden max-w-2xl mx-auto space-y-6">
         <div>
@@ -497,30 +575,36 @@
 
   <!-- Bottom Navigation Bar (Highly optimized for touch, mobile and desktop) -->
   <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-md border-t border-slate-800/80 py-2 sm:py-3 shadow-2xl">
-    <div class="max-w-md mx-auto px-6 flex items-center justify-between">
+    <div class="max-w-md mx-auto px-4 flex items-center justify-between">
       
       <!-- Nav Item 1: Dashboard -->
       <button onclick="switchTab('dashboard')" class="nav-item flex flex-col items-center space-y-1 group transition active:scale-95 text-brand-500" data-tab="dashboard">
         <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
-        <span class="text-[10px] font-semibold tracking-wide">Command</span>
+        <span class="text-[9px] font-semibold tracking-wide">Command</span>
       </button>
 
       <!-- Nav Item 2: Goals Architect -->
       <button onclick="switchTab('goals')" class="nav-item flex flex-col items-center space-y-1 group transition active:scale-95 text-slate-400 hover:text-white" data-tab="goals">
         <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-        <span class="text-[10px] font-semibold tracking-wide">Architect</span>
+        <span class="text-[9px] font-semibold tracking-wide">Architect</span>
       </button>
 
       <!-- Nav Item 3: Daily Habits -->
       <button onclick="switchTab('daily')" class="nav-item flex flex-col items-center space-y-1 group transition active:scale-95 text-slate-400 hover:text-white" data-tab="daily">
         <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span class="text-[10px] font-semibold tracking-wide">Daily Tracking</span>
+        <span class="text-[10px] font-semibold tracking-wide flex-shrink-0">Daily</span>
       </button>
 
-      <!-- Nav Item 4: Settings -->
+      <!-- Nav Item 4: Weekly Review -->
+      <button onclick="switchTab('weekly')" class="nav-item flex flex-col items-center space-y-1 group transition active:scale-95 text-slate-400 hover:text-white" data-tab="weekly">
+        <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+        <span class="text-[10px] font-semibold tracking-wide">Weekly</span>
+      </button>
+
+      <!-- Nav Item 5: Settings -->
       <button onclick="switchTab('settings')" class="nav-item flex flex-col items-center space-y-1 group transition active:scale-95 text-slate-400 hover:text-white" data-tab="settings">
         <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
-        <span class="text-[10px] font-semibold tracking-wide">Settings</span>
+        <span class="text-[9px] font-semibold tracking-wide">Settings</span>
       </button>
 
     </div>
@@ -532,21 +616,30 @@
     let appState = {
       sheetsUrl: localStorage.getItem("systems_os_sheets_url") || "",
       goals: JSON.parse(localStorage.getItem("systems_os_goals")) || [],
-      dailyLogs: JSON.parse(localStorage.getItem("systems_os_daily_logs")) || []
+      dailyLogs: JSON.parse(localStorage.getItem("systems_os_daily_logs")) || [],
+      weeklyReviews: JSON.parse(localStorage.getItem("systems_os_weekly_reviews")) || []
     };
 
     // Initialize application state on page load
     window.addEventListener("DOMContentLoaded", () => {
-      // Setup current default date as today
+      // Setup current default date as today for daily forms
       const dateInput = document.getElementById("daily-date");
       if (dateInput) {
         const today = new Date().toISOString().split('T')[0];
         dateInput.value = today;
       }
 
+      // Setup current default date as today for weekly reviews
+      const weeklyDateInput = document.getElementById("weekly-date");
+      if (weeklyDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        weeklyDateInput.value = today;
+      }
+
       // Perform initial calculations & ui updates
       calculateViability();
       calculateDailyScore();
+      calculateWeeklyStats();
       updateConnectionStateUI();
       renderDashboard();
     });
@@ -554,13 +647,20 @@
     // Navigation state logic
     function switchTab(tabId) {
       // Hide all tabs
-      const tabs = ["dashboard", "goals", "daily", "settings"];
+      const tabs = ["dashboard", "goals", "daily", "weekly", "settings"];
       tabs.forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add("hidden");
+        const element = document.getElementById(`tab-${t}`);
+        if (element) element.classList.add("hidden");
       });
 
       // Show active tab
-      document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+      const activeElement = document.getElementById(`tab-${tabId}`);
+      if (activeElement) activeElement.classList.remove("hidden");
+
+      // Recalculate stats dynamically if visiting weekly reviews tab
+      if (tabId === 'weekly') {
+        calculateWeeklyStats();
+      }
 
       // Update Navigation styling
       const navItems = document.querySelectorAll(".nav-item");
@@ -586,8 +686,9 @@
 
       const input = document.createElement("input");
       input.type = "text";
-      input.className = "major-move bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm w-full placeholder-slate-600 outline-none transition";
+      input.className = "major-move bg-slate-950 border border-slate-800 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 rounded-xl px-4 py-3 text-sm w-full placeholder-slate-600 outline-none transition mt-2";
       input.placeholder = `Move ${currentInputs + 1}`;
+      input.required = true;
       container.appendChild(input);
     }
 
@@ -659,6 +760,23 @@
         100: "Peak focus. Absolute execution achieved."
       };
       document.getElementById("score-comment").textContent = comments[score] || "";
+    }
+
+    // Calculate Weekly Averages to supply to Weekly reviews
+    function calculateWeeklyStats() {
+      const avgEl = document.getElementById("weekly-habit-average");
+      if (!avgEl) return;
+
+      if (appState.dailyLogs.length === 0) {
+        avgEl.textContent = "0%";
+        return;
+      }
+
+      // Slice out last 7 logged execution entries for a 7-day trailing average
+      const targetLogs = appState.dailyLogs.slice(0, 7);
+      const totalScore = targetLogs.reduce((acc, log) => acc + log.dailyScore, 0);
+      const averageScore = Math.round(totalScore / targetLogs.length);
+      avgEl.textContent = `${averageScore}%`;
     }
 
     // Local Storage & API Connector Integration Core
@@ -907,6 +1025,92 @@
       switchTab("dashboard");
     }
 
+    // Weekly Audit Review Form submission handler
+    async function handleWeeklySubmit(e) {
+      e.preventDefault();
+
+      const weekEndingDate = document.getElementById("weekly-date").value;
+      const weeklyReviewDone = document.getElementById("weekly-done").checked;
+      const pivotNotes = document.getElementById("weekly-pivot").value.trim();
+
+      // Retrieve focus goals
+      const goal1 = document.getElementById("weekly-goal-1").value.trim();
+      const goal2 = document.getElementById("weekly-goal-2").value.trim();
+      const goal3 = document.getElementById("weekly-goal-3").value.trim();
+
+      // Calculate Trailing habit consistency
+      let avgScore = 0;
+      if (appState.dailyLogs.length > 0) {
+        const targetLogs = appState.dailyLogs.slice(0, 7);
+        const total = targetLogs.reduce((acc, log) => acc + log.dailyScore, 0);
+        avgScore = Math.round(total / targetLogs.length);
+      }
+
+      const newWeeklyLog = {
+        id: Date.now().toString(),
+        weekEndingDate,
+        weeklyReviewDone,
+        avgScore,
+        pivotNotes,
+        weeklyGoals: [goal1, goal2, goal3]
+      };
+
+      // Loading state metrics update
+      const btn = document.getElementById("save-weekly-btn");
+      const btnText = document.getElementById("save-weekly-btn-text");
+      const spinner = document.getElementById("save-weekly-spinner");
+
+      btn.disabled = true;
+      btnText.textContent = "Archiving review...";
+      spinner.classList.remove("hidden");
+
+      // Save locally inside browser
+      appState.weeklyReviews.unshift(newWeeklyLog);
+      localStorage.setItem("systems_os_weekly_reviews", JSON.stringify(appState.weeklyReviews));
+
+      let syncSuccessful = false;
+
+      // Sync Cloud
+      if (appState.sheetsUrl) {
+        try {
+          await fetch(appState.sheetsUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              action: "saveWeekly",
+              payload: newWeeklyLog
+            })
+          });
+          syncSuccessful = true;
+        } catch (err) {
+          console.error("Sheets Error:", err);
+          showToast("Sync issue encountered, saved inside browser local storage.", "warning");
+        }
+      }
+
+      // Reset Form fields
+      document.getElementById("weekly-form").reset();
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("weekly-date").value = today;
+
+      btn.disabled = false;
+      btnText.textContent = "Archive Weekly review";
+      spinner.classList.add("hidden");
+
+      if (syncSuccessful) {
+        showToast("Logged directly to Google Sheets Weekly Tab!", "success");
+      } else {
+        showToast("Review saved locally in fallback database.", "success");
+      }
+
+      calculateWeeklyStats();
+      renderDashboard();
+      switchTab("dashboard");
+    }
+
     // Delete a goal locally
     function deleteGoalLocally(goalId) {
       if (confirm("Are you sure you want to archive this goal from this device? (Note: Sheet entries are never deleted to preserve tracking history).")) {
@@ -964,42 +1168,62 @@
           </div>
         `;
       } else {
-        goalsList.innerHTML = appState.goals.map(goal => `
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 relative overflow-hidden">
-            <!-- Header -->
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="text-[10px] bg-slate-800 text-slate-400 font-bold tracking-widest uppercase px-2 py-0.5 rounded-md">Goal Established: ${goal.createdAt}</span>
-                <h4 class="text-lg font-bold text-white mt-1.5">${goal.what}</h4>
-              </div>
-              <button onclick="deleteGoalLocally('${goal.id}')" class="text-slate-500 hover:text-red-400 p-1.5 transition rounded-lg hover:bg-slate-950" title="Archive locally">
-                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-              </button>
-            </div>
-
-            <!-- Deep Intention details -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950/40 p-4 rounded-xl border border-slate-800/65">
-              <div>
-                <span class="block text-[10px] text-brand-500 uppercase font-bold tracking-wider">The "Why" Directive</span>
-                <p class="text-xs text-slate-300 mt-1 italic">"${goal.why}"</p>
-              </div>
-              <div>
-                <span class="block text-[10px] text-amber-500 uppercase font-bold tracking-wider">The Anti-Goal Guardrails</span>
-                <p class="text-xs text-slate-300 mt-1 italic">"${goal.antiGoals}"</p>
-              </div>
-            </div>
-
-            <!-- Moves Progression list -->
-            <div>
-              <span class="block text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2">3 to 5 Major Moves Sequence</span>
-              <div class="flex flex-wrap gap-2">
-                ${goal.majorMoves.map((move, i) => `
-                  <span class="text-xs bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-200 font-medium">
-                    <span class="text-brand-500 font-bold mr-1">#${i+1}</span> ${move}
-                  </span>
+        goalsList.innerHTML = appState.goals.map(goal => {
+          // Look up active weekly goals to see if they associate with the dashboard
+          const currentWeeklyReview = appState.weeklyReviews[0];
+          const weeklyGoalsSection = currentWeeklyReview ? `
+            <div class="border-t border-slate-800/80 pt-3">
+              <span class="block text-[10px] text-brand-400 uppercase font-bold tracking-wider mb-2">Tactical Weekly Focus (Action Goals)</span>
+              <ul class="space-y-1 text-xs text-slate-300">
+                ${currentWeeklyReview.weeklyGoals.map((wg, idx) => `
+                  <li class="flex items-center gap-1.5 font-medium">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                    Target #${idx+1}: <span class="text-slate-100">${wg}</span>
+                  </li>
                 `).join('')}
+              </ul>
+            </div>
+          ` : '';
+
+          return `
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 relative overflow-hidden">
+              <!-- Header -->
+              <div class="flex items-start justify-between">
+                <div>
+                  <span class="text-[10px] bg-slate-800 text-slate-400 font-bold tracking-widest uppercase px-2 py-0.5 rounded-md">Goal Established: ${goal.createdAt}</span>
+                  <h4 class="text-lg font-bold text-white mt-1.5">${goal.what}</h4>
+                </div>
+                <button onclick="deleteGoalLocally('${goal.id}')" class="text-slate-500 hover:text-red-400 p-1.5 transition rounded-lg hover:bg-slate-950" title="Archive locally">
+                  <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
+
+              <!-- Deep Intention details -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950/40 p-4 rounded-xl border border-slate-800/65">
+                <div>
+                  <span class="block text-[10px] text-brand-500 uppercase font-bold tracking-wider">The "Why" Directive</span>
+                  <p class="text-xs text-slate-300 mt-1 italic">"${goal.why}"</p>
+                </div>
+                <div>
+                  <span class="block text-[10px] text-amber-500 uppercase font-bold tracking-wider">The Anti-Goal Guardrails</span>
+                  <p class="text-xs text-slate-300 mt-1 italic">"${goal.antiGoals}"</p>
+                </div>
+              </div>
+
+              <!-- Moves Progression list -->
+              <div>
+                <span class="block text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2">3 to 5 Major Moves Sequence</span>
+                <div class="flex flex-wrap gap-2">
+                  ${goal.majorMoves.map((move, i) => `
+                    <span class="text-xs bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-200 font-medium">
+                      <span class="text-brand-500 font-bold mr-1">#${i+1}</span> ${move}
+                    </span>
+                  `).join('')}
               </div>
             </div>
+
+            <!-- Weekly Focus target connection on Dashboard -->
+            ${weeklyGoalsSection}
 
             <!-- Pre-Mortem Mitigation Framework -->
             <div class="border-t border-slate-800/80 pt-3">
@@ -1026,7 +1250,8 @@
               </span>
             </div>
           </div>
-        `);
+        `;
+      }).join('');
       }
 
       // Render History Log List
